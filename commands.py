@@ -6,16 +6,35 @@ _commands = {
     "help": "show the list of commands, or a specific commands information.",
     "reset": "erase your save file and start a new game. Cannot be undone",
     "exit": "exit and save the game. Current battle progress will be lost.",
-    "test": 'test message. Can be used as such: "test messagehere"'}
+    "test": 'test message. Can be used as such: "test messagehere"',
+    "travel": 'travel to an available location. Further use as:\n"travel info" (show what locations are near by),\n"travel list" (show all available locations),\n"travel location a" (travel to location a)'
+        }
 
 _locations = {
-    "location a": {"nearby": ["location b", "location f"]},
-    "location b": {"nearby": ["location a", "location c", "location e"]},
-    "location c": {"nearby": ["location b"]},
-    "location e": {"nearby": ["location b"]},
-    "location f": {"nearby": ["location a"]}
+    "location a": {
+        "nearby": ["location b", "location f"],
+        "shops": [""]
+        },
+    "location b": {
+        "nearby": ["location a", "location c", "location e"],
+        "shops": [""]
+        },
+    "location c": {
+        "nearby": ["location b"],
+        "shops": [""]
+        },
+    "location e": {
+        "nearby": ["location b"],
+        "shops": [""]
+        },
+    "location f": {
+        "nearby": ["location a"]
+        , "shops": [""]
+        }
 
     }
+
+_shops = {}
 
 
 def game_test(x):
@@ -41,19 +60,26 @@ def game_reset(x):
 
 def game_travel(x):
     x = x.lower()
+
     try:
         env_dict = json.loads(game_data["environment"])
         current_location = env_dict["progress"]["location"]
         if x == current_location:
             print("You are already here.")
             return
-        dest_nearby = _locations[x]["nearby"]
+
         current_nearby = _locations[current_location]["nearby"]
+        if x == "info":
+            print("I am near by [{}]".format(", ".join(current_nearby)))
+            return
+        elif x == "list":
+            print("Locations Accessible to you: " + ", ".join(_locations.keys()))
+            return
+        dest_nearby = _locations[x]["nearby"]
         a = set(dest_nearby)
         b = set(current_nearby)
         if (a & b):
             _link = list(a&b)
-            print(_link)
         else:
             _link = "none"
         if current_location in dest_nearby:
@@ -87,4 +113,4 @@ def game_help(x):
         except:
             print("That is not a valid command")
     else:
-        print('Commands so far: [help, reset, exit, test, save]\nUse the help command to check individual commands, like "help reset", to show what reset does.')
+        print('Commands so far: [help, reset, exit, test, save, travel]\nUse the help command to check individual commands, like "help reset", to show what reset does.')
