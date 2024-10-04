@@ -97,14 +97,14 @@ def game_travel(x):
 
 
 def game_save(x):
-    print("saving")
+    print("Saving... do not exit")
     f = open("game_data.txt", "w")
     for i in game_data:
         _dict = json.loads(game_data[i])
         f.write(json.dumps([i,_dict])+"\n")
     f.close()
     time.sleep(1)
-    print('saving done')
+    print('Saving done')
 
 def game_help(x):
     if len(x) >0:
