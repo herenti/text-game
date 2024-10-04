@@ -36,6 +36,7 @@ while _running["game"] == "on":
                 func = "game_"+func
                 ret = 0
                 if func == "game_exit":
+                    commands.game_save('')
                     _running["game"] = "off"
                     ret = 1
                 elif hasattr(commands, func):
@@ -95,7 +96,7 @@ while _running["game"] == "on":
         _user = dict(info=_info, status=_status, inventory=_inventory)
 
         _combat = dict(monster="none", fighting="no")
-        _progress = dict(chapter="1", location="0")
+        _progress = dict(chapter="1", location="location a")
         _environment = dict(progress=_progress, combat=_combat, resume="no")
 
         game_data["user"] =  json.dumps(_user)
