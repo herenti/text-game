@@ -1,2 +1,1 @@
-["user", {"info": {"username": "herenti", "gender": "b", "age": 29, "sorientation": "b", "relationship": "single"}, "status": {}, "inventory": {"money": 0, "weapon": "none"}}]
-["environment", {"progress": {"chapter": "1", "location": "0"}, "combat": {"monster": "none", "fighting": "no"}, "resume": "no"}]
+
