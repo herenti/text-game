@@ -45,11 +45,12 @@ _shops = {}
 
 _local = {"game": "on",
           "r_e_notify": 0,
-          "events": []
+          "events": [],
+          "random_event_number": 0
           }
 
 
-def random_event(): #have it randomly select from events_dict random
+def random_event(): #to do: have it randomly select from events_dict random.
     env_dict = json.loads(game_data["environment"])
     current_location = env_dict["progress"]["location"]
     user_dict = json.loads(game_data["user"])
@@ -66,6 +67,7 @@ def random_event(): #have it randomly select from events_dict random
         __choice["events"].append("random")
         _local["r_e_notify"] = _choice
         _local["events"].append(_choice)
+        _local["random_event_number"] = "randomlyselectedeventnum"
 
     else:
         pass
@@ -90,14 +92,22 @@ def event_start():
         _choice = input("There is a {} event here... do you wish to engage? Y/N\n".format(_type))
         time.sleep(1)
         _choice = _choice.lower()
+
     if _choice == "y":
         print("Starting {} event".format(_type))
+        event_id = _local["random_event_number"]
+
+        #_id = events_dict["random"][event_id]
+        #event_run("random", _id)
+
         time.sleep(1)
         _local["events"].remove(current_location)
         _locations[current_location]["events"].remove("random")
         print("Event Finished...")
     else:
         print("Canceling")
+
+#def event_run(_type, _id):
 
 
 def game_test(x):
@@ -125,7 +135,6 @@ def game_travel(x):
     x = x.lower()
     _trigger = random.choice(list(range(2)))
     if _trigger == 1:
-        print(_trigger)
         random_event()
 
     try:

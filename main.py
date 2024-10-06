@@ -127,6 +127,7 @@ while commands._local["game"] == "on":
 
             if env_dict["progress"]["location"] in commands._local["events"]:
                 commands.event_start()
+                interact()
             interact()
 
 
