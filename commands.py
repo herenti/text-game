@@ -1,5 +1,7 @@
 import json
 import time
+import random
+from events_data import events_dict
 from text import game_data
 
 _commands = {
@@ -13,28 +15,89 @@ _commands = {
 _locations = {
     "location a": {
         "nearby": ["location b", "location f"],
-        "shops": [""]
+        "shops": [""],
+        "events": []
         },
     "location b": {
         "nearby": ["location a", "location c", "location e"],
-        "shops": [""]
+        "shops": [""],
+        "events": []
         },
     "location c": {
         "nearby": ["location b"],
-        "shops": [""]
+        "shops": [""],
+        "events": []
         },
     "location e": {
         "nearby": ["location b"],
-        "shops": [""]
+        "shops": [""],
+        "events": []
         },
     "location f": {
-        "nearby": ["location a"]
-        , "shops": [""]
+        "nearby": ["location a"],
+        "shops": [""],
+        "events": []
         }
 
     }
 
 _shops = {}
+
+_local = {"game": "on",
+          "r_e_notify": 0,
+          "events": []
+          }
+
+
+def random_event(): #have it randomly select from events_dict random
+    env_dict = json.loads(game_data["environment"])
+    current_location = env_dict["progress"]["location"]
+    user_dict = json.loads(game_data["user"])
+    a = []
+    for i in _locations:
+        for x in _locations[i]["events"]:
+            if x == "random":
+                a.append(1)
+            else:
+                a.append(0)
+    if 1 not in a:
+        _choice = random.choice(list(_locations.keys()))
+        __choice = _locations[_choice]
+        __choice["events"].append("random")
+        _local["r_e_notify"] = _choice
+        _local["events"].append(_choice)
+
+    else:
+        pass
+
+def event_start():
+    env_dict = json.loads(game_data["environment"])
+    current_location = env_dict["progress"]["location"]
+
+    _type = _locations[current_location]["events"]
+    if "random" in _type:
+        _type = "random" #fix this
+    else:
+        _type = "story" #fix this.
+
+    _choice = input("There is a {} event here... do you wish to engage? Y/N\n".format(_type))
+    time.sleep(1)
+    _choice = _choice.lower()
+    options = ["y","n"]
+    while _choice not in options:
+        print("That is not a choice. Please try again.")
+        time.sleep(1)
+        _choice = input("There is a {} event here... do you wish to engage? Y/N\n".format(_type))
+        time.sleep(1)
+        _choice = _choice.lower()
+    if _choice == "y":
+        print("Starting {} event".format(_type))
+        time.sleep(1)
+        _local["events"].remove(current_location)
+        _locations[current_location]["events"].remove("random")
+        print("Event Finished...")
+    else:
+        print("Canceling")
 
 
 def game_test(x):
@@ -60,6 +123,10 @@ def game_reset(x):
 
 def game_travel(x):
     x = x.lower()
+    _trigger = random.choice(list(range(2)))
+    if _trigger == 1:
+        print(_trigger)
+        random_event()
 
     try:
         env_dict = json.loads(game_data["environment"])

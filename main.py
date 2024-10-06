@@ -10,10 +10,10 @@ if len(game_data) > 0:
     game_data["environment"] = json.dumps(env_dict)
 
 
-_running = {"game": "on"}
 
 
-while _running["game"] == "on":
+
+while commands._local["game"] == "on":
 
     def resume():
         env_dict = json.loads(game_data["environment"])
@@ -24,6 +24,7 @@ while _running["game"] == "on":
 
 
     def interact():
+
         command = input("command: ")
         time.sleep(1)
         if len(command) > 0:
@@ -37,7 +38,7 @@ while _running["game"] == "on":
                 ret = 0
                 if func == "game_exit":
                     commands.game_save('')
-                    _running["game"] = "off"
+                    commands._local["game"] = "off"
                     ret = 1
                 elif hasattr(commands, func):
                     ret = getattr(commands, func)(data)
@@ -119,6 +120,13 @@ while _running["game"] == "on":
         if env_dict["resume"] == "yes":
             resume()
         else:
+            if commands._local["r_e_notify"] != 0:
+                print("there is a disturbance in {}....".format(commands._local["r_e_notify"]))
+                commands._local["r_e_notify"] = 0
+                time.sleep(1)
+
+            if env_dict["progress"]["location"] in commands._local["events"]:
+                commands.event_start()
             interact()
 
 
