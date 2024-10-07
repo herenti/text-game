@@ -1,5 +1,6 @@
 import json
 import time
+import sys
 import random
 from events_data import events_dict
 from text import game_data
@@ -45,18 +46,113 @@ _shops = {}
 
 _local = {"game": "on",
           "r_e_notify": 0,
-          "events": [],
+          "events": {},
           "random_event_number": 0
           }
 
+def register():
+    print("Welcome new user, the time has finally come. Let's register for the game.")
+    time.sleep(1)
 
-def random_event(): #to do: have it randomly select from events_dict random.
+    _username = input("Firstly, What is your name?\n")
+    time.sleep(1)
+
+    _gender = input("What is your gender identification? (more genders to come)\nA) Male\nB) Female\nC) Non binary\n")
+    _gender = _gender.lower()
+    time.sleep(1)
+
+    options = ["a","b","c"]
+
+    while _gender not in options:
+        print("That is not a valid gender. Please try again.")
+        time.sleep(1)
+        _gender = input("What is your gender identification? (more genders to come)\nA) Male\nB) Female\nC) Non binary\n")
+        time.sleep(1)
+        _gender = _gender.lower()
+
+    _sorientation = input("What is your sexual orientation? (more to come)\nA) Male attracted\nB) Female Attracted\nC) Bisexual\nD) Pansexual\n")
+    _sorientation = _sorientation.lower()
+    options = ["a","b","c","d"]
+
+    while _sorientation not in options:
+        print("That is not a valid orientation. Please try again.")
+        time.sleep(1)
+        _sorientation = input("What is your sexual orientation? (more to come)\nA) Male attracted\nB) Female Attracted\nC) Bisexual\nD) Pansexual\n")
+        time.sleep(1)
+        _sorientation = _sorientation.lower()
+
+    _break = "0"
+    while _break == "0":
+        _age = input("What is your age?\n")
+        time.sleep(1)
+        try:
+            _age = int(_age)
+            _break = "1"
+        except:
+            print("That is not a valid age. Please make it be a number")
+            _break = "0"
+            time.sleep(1)
+
+    time.sleep(1)
+    _info = dict(username=_username, gender=_gender, age=_age, sorientation=_sorientation, relationship="single")
+    _status = dict()
+    _inventory = dict(money=0, weapon="none")
+    _user = dict(info=_info, status=_status, inventory=_inventory)
+
+    _combat = dict(monster="none", fighting="no")
+    _progress = dict(chapter="1", location="location a")
+    _environment = dict(progress=_progress, combat=_combat)
+
+    game_data["user"] =  json.dumps(_user)
+    game_data["environment"] = json.dumps(_environment)
+    print("COngradulations, {} you have registered!".format(_username))
+    time.sleep(1)
+    print('saving, do not exit.')
+    f = open("game_data.txt", "w")
+    for i in game_data:
+        _dict = json.loads(game_data[i])
+        f.write(json.dumps([i,_dict])+"\n")
+    f.close()
+    time.sleep(1)
+    print('saving done')
+    time.sleep(1)
+
+def resume():
+        env_dict = json.loads(game_data["environment"])
+        print("Resuming game. Chapter: {}, Location: {}.".format(env_dict["progress"]["chapter"], env_dict["progress"]["location"]))
+        _local["resume"] = "no"
+        time.sleep(1)
+
+def interact():
+    command = input("command: ")
+    time.sleep(1)
+    if len(command) > 0:
+            data = command.split(" ", 1)
+            if len(data) > 1:
+                func, data = data[0], data[1]
+            else:
+                func, data = data[0], ""
+            func = func.lower()
+            func = "game_"+func
+            ret = 0
+            if func == "game_exit":
+                game_save('')
+                _local["game"] = "off"
+                ret = 1
+            elif hasattr(sys.modules[__name__], func):
+                ret = getattr(sys.modules[__name__], func)(data)
+                time.sleep(1)
+            if ret == 0:
+                print('Not a valid command. Use "help" for more info.')
+                time.sleep(1)
+
+def random_event():
     env_dict = json.loads(game_data["environment"])
     current_location = env_dict["progress"]["location"]
     user_dict = json.loads(game_data["user"])
     a = []
     for i in _locations:
-        for x in _locations[i]["events"]:
+        for x in _locations[i]["events"]: #switch to local dict
             if x == "random":
                 a.append(1)
             else:
@@ -66,7 +162,10 @@ def random_event(): #to do: have it randomly select from events_dict random.
         __choice = _locations[_choice]
         __choice["events"].append("random")
         _local["r_e_notify"] = _choice
-        _local["events"].append(_choice)
+
+        event_choice = random.choice([i for i in events_dict["random"]]) #check if works
+
+        _local["events"][_choice] = dict(random = event_choice)
         _local["random_event_number"] = "randomlyselectedeventnum"
 
     else:
@@ -95,13 +194,13 @@ def event_start():
 
     if _choice == "y":
         print("Starting {} event".format(_type))
-        event_id = _local["random_event_number"]
+        event_id = _local["events"][current_location]["random"]
+        load_id = events_dict["random"][event_id]
 
-        #_id = events_dict["random"][event_id]
         #event_run("random", _id)
 
         time.sleep(1)
-        _local["events"].remove(current_location)
+        del _local["events"][current_location]
         _locations[current_location]["events"].remove("random")
         print("Event Finished...")
     else:
